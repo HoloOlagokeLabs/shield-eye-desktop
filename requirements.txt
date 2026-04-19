@@ -1,0 +1,58 @@
+# ==============================================================
+# ShieldEye Desktop - Runtime Requirements
+# ==============================================================
+# Install with: pip install -r requirements.txt
+# ==============================================================
+
+# --- Core UI ---
+PySide6==6.11.0
+PySide6_Addons==6.11.0
+PySide6_Essentials==6.11.0
+
+# --- HTTP & Networking ---
+requests==2.33.1
+
+# --- Version & Utilities ---
+packaging==26.0
+
+# --- Keyring / Credential Storage ---
+keyring==25.7.0
+
+# --- Encryption & Security ---
+cryptography==46.0.6
+python-dotenv==1.2.2
+
+# ==============================================================
+# Platform-Specific
+# ==============================================================
+
+# --- Linux only (SQLCipher and Keyring backends) ---
+sqlcipher3==0.6.2; sys_platform == 'linux'
+SecretStorage==3.5.0; sys_platform == 'linux'
+jeepney==0.9.0; sys_platform == 'linux'
+
+# --- Windows only (SQLCipher and Win32 backends) ---
+sqlcipher3-wheels==0.5.7; sys_platform == 'win32'
+pywin32-ctypes==0.2.3; sys_platform == 'win32'
+
+# ==============================================================
+# Indirect / Auto-installed (do not need to list explicitly)
+# These are pulled in automatically by the packages above
+# ==============================================================
+# certifi                   # pulled in by requests
+# charset-normalizer        # pulled in by requests
+# idna                      # pulled in by requests
+# urllib3                   # pulled in by requests
+# shiboken6                 # pulled in by PySide6
+# cffi                      # pulled in by cryptography
+# pycparser                 # pulled in by cffi
+# jaraco.classes            # pulled in by keyring
+# jaraco.context            # pulled in by keyring
+# jaraco.functools          # pulled in by keyring
+# more-itertools            # pulled in by jaraco.functools
+# importlib_metadata        # pulled in by keyring
+# importlib_resources       # pulled in by keyring
+# zstandard                 # pulled in by urllib3
+# zipp                      # pulled in by importlib_resources
+# backports.tarfile         # pulled in by jaraco.context
+# typing_extensions         # pulled in by PySide6 / keyring

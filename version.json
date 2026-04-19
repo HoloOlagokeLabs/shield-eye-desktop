@@ -1,0 +1,15 @@
+{
+    "version": "1.0.0",
+    "release_date": "2026-04-19",
+    "repo_url": "https://github.com/holoolagoke/shield-eye-desktop",
+    "platforms": {
+        "linux": {
+            "hash": "bca9b2948000c77f83aa7451909e093de6c922a0d9f75790865044e0d651b168",
+            "download_url": "https://github.com/holoolagoke/shield-eye-desktop/releases/download/v1.0.0/shieldeye_1.0.0_amd64.deb"
+        },
+        "windows": {
+            "hash": "d7a9b5c3ae1474f8d72cec89b91f09cdfad22a8d2a74125e3d7ce8bad8b176c2",
+            "download_url": "https://github.com/holoolagoke/shield-eye-desktop/releases/download/v1.0.0/shieldeye_1.0.0_setup.exe"
+        }
+    }
+}
