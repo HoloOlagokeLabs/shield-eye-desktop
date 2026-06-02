@@ -5,11 +5,11 @@
     "platforms": {
         "linux": {
             "hash": "0982c14bf8693cfb8796bad14c121eaec605f4e620a118c7e7db42e0dac6b32e",
-            "download_url": "https://github.com/holoolagoke/shield-eye-desktop/releases/download/v1.0.0/shieldeye_1.0.0_amd64.deb"
+            "download_url": "https://github.com/holoolagoke/shield-eye-desktop/releases/download/v1.1.0/shieldeye_1.1.0_amd64.deb"
         },
         "windows": {
             "hash": "eff24b044785e2917f10b6418f672211751affdbf7315b15b20d10374ae7f416",
-            "download_url": "https://github.com/holoolagoke/shield-eye-desktop/releases/download/v1.0.0/shieldeye_1.0.0_setup.exe"
+            "download_url": "https://github.com/holoolagoke/shield-eye-desktop/releases/download/v1.1.0/shieldeye_1.1.0_setup.exe"
         }
     }
 }
