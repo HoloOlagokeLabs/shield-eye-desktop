@@ -12,8 +12,8 @@ You can install ShieldEye on any Debian-based distribution (Ubuntu, Kali, Mint, 
 
 ```bash
 sudo apt update
-wget "https://github.com/holoolagoke/shield-eye-desktop/releases/download/v1.0.0/shieldeye_1.0.0_amd64.deb"
-sudo apt install ./shieldeye_1.0.0_amd64.deb
+wget "https://github.com/holoolagoke/shield-eye-desktop/releases/download/v1.1.0/shieldeye_1.1.0_amd64.deb"
+sudo apt install ./shieldeye_1.1.0_amd64.deb
 ```
 
 [**Using dpkg**]
@@ -21,8 +21,8 @@ sudo apt install ./shieldeye_1.0.0_amd64.deb
 If you prefer the standard Debian package tool:
 
 ```bash
-wget "https://github.com/holoolagoke/shield-eye-desktop/releases/download/v1.0.0/shieldeye_1.0.0_amd64.deb"
-sudo dpkg -i shieldeye_1.0.0_amd64.deb
+wget "https://github.com/holoolagoke/shield-eye-desktop/releases/download/v1.1.0/shieldeye_1.1.0_amd64.deb"
+sudo dpkg -i shieldeye_1.1.0_amd64.deb
 sudo apt-get install -f
 ```
 
@@ -31,10 +31,10 @@ sudo apt-get install -f
 Download the installer using your browser or PowerShell:
 
 ```powershell
-curl -L -o shieldeye_1.0.0_setup.exe "https://github.com/holoolagoke/shield-eye-desktop/releases/download/v1.0.0/shieldeye_1.0.0_setup.exe"
+curl -L -o shieldeye_1.1.0_setup.exe "https://github.com/holoolagoke/shield-eye-desktop/releases/download/v1.1.0/shieldeye_1.1.0_setup.exe"
 ```
 
-Then double-click `shieldeye_1.0.0_setup.exe` to run the installer.
+Then double-click `shieldeye_1.1.0_setup.exe` to run the installer.
 
 ## Method 2: Using GUI
 

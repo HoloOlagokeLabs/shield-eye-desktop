@@ -5,16 +5,19 @@ from PySide6.QtWidgets import (
 )
 from collections import Counter
 from PySide6.QtCore import QSortFilterProxyModel, Qt, Signal
-from gui.widgets.card import *
-from utils.db_crud import *
+from utils.db_crud import Database
+from gui.widgets.card import SummaryCard, SmallSummaryCard
 from gui.widgets.log_table import AlertTableModel
-from gui.widgets.dialog_win import *
+from gui.widgets.dialog_win import ConfirmDialog
 from gui.widgets.css import ALERT_BTN_STYLES, GENERAL_STYLES, LOG_TABLE_STYLES
 
 class Notifications(QWidget):
     refresh_database = Signal()
+
+
     def __init__(self):
         super().__init__()
+        self.db = Database()
         self.setAutoFillBackground(True)
         self.alert_logs = []
         self.filtered_alerts = []
@@ -26,7 +29,8 @@ class Notifications(QWidget):
         self.summary_ui()
         self.table_and_detail_ui()
         self.css_styles()
-        
+
+
     # summary
     def summary_ui(self):
         container = QHBoxLayout()
@@ -88,10 +92,12 @@ class Notifications(QWidget):
         container.addStretch(1)
         self.main_layout.addLayout(container)
 
+
     # table & pane
     def filter_alerts(self, text):
         self.proxy.setFilterCaseSensitivity(Qt.CaseInsensitive)
         self.proxy.setFilterFixedString(text)
+
 
     def table_and_detail_ui(self):
         splitter = QSplitter(Qt.Horizontal)
@@ -121,6 +127,7 @@ class Notifications(QWidget):
         self.layout().addWidget(splitter)
         self.layout().addWidget(self.search_box)
 
+
     def inspect_alerts(self, selected_alerts):
         source_index = self.proxy.mapToSource(selected_alerts)
         alert = self.filtered_alerts[source_index.row()]
@@ -129,56 +136,69 @@ class Notifications(QWidget):
         self.detail.setText(formatted)
         self.alert_id = alert_dict["id"]
 
+
     def read_alert_btn_clicked(self):
         if self.alert_id:
-            result = mark_alert_as_read(self.alert_id)
+            result = self.db.mark_alert_as_read(self.alert_id)
             if result:
                 self.refresh_database.emit()
                 QMessageBox.information(self, "Successful", "Alert marked as read")
             return
         QMessageBox.warning(self, "Error", "No alert selected")
 
+
     def read_all_btn_clicked(self):
         if self.alert_logs:
-            result = mark_all_alert()
+            result = self.db.mark_all_alert()
+
             if result:
                 self.refresh_database.emit()
                 QMessageBox.information(self, "Successful", "All alert marked as read")
+            
             return
         QMessageBox.warning(self, "Error", "No alert detected")
+
 
     def delete_alert_btn_clicked(self):
         if self.alert_id:
             title = "Delete Alert"
             message = f"Are you sure you want to delete alert {self.alert_id}"
             dialog = ConfirmDialog(title, message, self)
+
             if dialog.exec() == QDialog.Accepted:
-                result = delete_alert(self.alert_id)
+                result = self.db.delete_alert(self.alert_id)
                 if result:
                     self.refresh_database.emit()
                     QMessageBox.information(self, "Successful", f"Alert {self.alert_id} deleted")
+                    
             return
         QMessageBox.warning(self, "Error", "No alert selected")
-        
+
+
     def delete_all_alert_btn_clicked(self):
         if self.alert_logs:
             title = "Delete All Alert"
             message = f"Are you sure you want to delete all alerts"
             dialog = ConfirmDialog(title, message, self)
+
             if dialog.exec() == QDialog.Accepted:
-                result = delete_all_alerts()
+                result = self.db.delete_all_alerts()
+
                 if result:
                     self.refresh_database.emit()
                     QMessageBox.information(self, "Successful", f"All alerts deleted")
+
             return
         QMessageBox.warning(self, "Error", "No alert detected")
-    
+
+
     def update_data(self, new_alerts):
         self.alert_logs = new_alerts
         self.filtered_alerts = new_alerts
         self.model.refresh_alerts_ui(self.filtered_alerts)
         self.refresh_ui(self.alert_logs)
-    
+
+
     def refresh_ui(self, new_alert_logs=None):
         self.new_alert_logs = new_alert_logs if new_alert_logs is not None else []
         stats = Counter(x for l in (self.new_alert_logs or []) for x in (l["level"], l["status"]))
@@ -189,7 +209,8 @@ class Notifications(QWidget):
         self.total_card.update_summarycard_value(len(self.new_alert_logs or []))
         self.read_card.update_summarycard_value(stats.get("read", 0))
         self.unread_card.update_summarycard_value(stats.get("unread", 0))
-    
+
+
     # style
     def css_styles(self):
         styles = [

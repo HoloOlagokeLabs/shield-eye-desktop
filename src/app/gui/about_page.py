@@ -2,16 +2,17 @@ import os
 import subprocess
 import sys
 import traceback
-from PySide6.QtCore import QCoreApplication, QThreadPool, Slot
+from PySide6.QtCore import QCoreApplication, QThreadPool, Slot, QUrl
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QDialog,
     QPushButton, QMessageBox, QProgressDialog
 )
+from PySide6.QtGui import QDesktopServices
 from gui.widgets.dialog_win import ConfirmDialog
 from gui.widgets.css import GENERAL_STYLES
 from gui.widgets.card import DetailCard
-from utils.db_crud import *
-from utils.check_update import *
+from utils.db_crud import Database
+from utils.check_update import UpdateChecker, UpdateDetailDialog, UpdateDownloader
 from packaging.version import Version
 
 
@@ -25,6 +26,7 @@ github_url = os.getenv("GITHUB_URL", default=None)
 website_url = os.getenv("WEBSITE_URL", default=None)
 shieldeye_website_url = os.getenv("SHIELDEYE_WEBSITE_URL", default=None)
 
+
 class About(QWidget):
     def __init__(self):
         super().__init__()
@@ -33,6 +35,7 @@ class About(QWidget):
         self.main_layout = QVBoxLayout(self) 
         self.page_ui()
         self.css_styles()
+
 
     def page_ui(self):
         container = QVBoxLayout()
@@ -62,6 +65,7 @@ class About(QWidget):
         container.addStretch(1)
         self.main_layout.addLayout(container)
 
+
     def start_update_check(self):
         if github_update_url:
             self.check_update_button.setEnabled(False)
@@ -87,11 +91,13 @@ class About(QWidget):
         if dialog.exec() == QDialog.Accepted:
             self.start_file_download(data)
 
+
     @Slot(str)
     def on_update_error(self, message):
         self.check_update_button.setEnabled(True)
         self.check_update_button.setText("Check update")
         QMessageBox.warning(None, "Update Error", f"Failed: {message}")
+
 
     def start_file_download(self, data):
         self.progress_bar = QProgressDialog("Downloading update...", "Cancel", 0, 100, self)
@@ -104,6 +110,7 @@ class About(QWidget):
         uploader.signals.finished.connect(self.execute_installer)
         
         self.threadpool.start(uploader)
+
 
     def execute_installer(self, file_path):
         if self.progress_bar:
@@ -167,8 +174,9 @@ class About(QWidget):
                     sys.exit()
 
             except Exception as e:
-                log_activity("error", "Update Error", source_dir, str(e), traceback.format_exc(), "execute_installer func")
+                Database.log_activity("error", "Update Error", source_dir, str(e), traceback.format_exc(), "execute_installer func")
                 QMessageBox.critical(self, "Error", f"Failed to launch installer: {e}")
+
 
     # style
     def css_styles(self):

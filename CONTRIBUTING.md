@@ -64,7 +64,7 @@ We will then take care of the issue as soon as possible.
 
 ## I Want To Contribute
 
-> ### Legal Notice >
+### Legal Notice
 >
 > When contributing to this project, you must agree that you have authored 100% of the content, that you have the necessary rights to the content and that the content you contribute may be provided under the project licence.
 
@@ -170,7 +170,7 @@ Create your `.env` file in the project root. Copy the structure below and fill i
 
 ```env
 APP_NAME=ShieldEye
-APP_VERSION=1.0.0
+APP_VERSION=1.1.0
 DB_NAME=database.db
 APPNAME=my_app_name
 THEUSER=the_app_user

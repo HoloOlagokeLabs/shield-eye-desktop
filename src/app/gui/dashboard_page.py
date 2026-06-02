@@ -7,15 +7,18 @@ from PySide6.QtCharts import QChart, QChartView, QPieSeries
 from PySide6.QtGui import QColor
 from collections import Counter
 from PySide6.QtCore import QSortFilterProxyModel, Qt
-from gui.widgets.card import *
-from utils.db_crud import *
+from utils.db_crud import Database
+from gui.widgets.card import SummaryCard, SmallSummaryCard
 from gui.widgets.log_table import LogTableModel
 from gui.widgets.css import GENERAL_STYLES, LOG_TABLE_STYLES
 
 class Dashboard(QWidget):
     refresh_database = Signal()
+
+
     def __init__(self):
         super().__init__()
+        self.db = Database()
         self.setAutoFillBackground(True)
         self.setWindowTitle("Dashboard")
         self.main_layout = QVBoxLayout(self) 
@@ -26,7 +29,8 @@ class Dashboard(QWidget):
         self.summary_ui()
         self.table_and_detail_ui()
         self.css_styles()
-        
+
+
     # summary
     def summary_ui(self):
         container = QHBoxLayout()
@@ -49,8 +53,7 @@ class Dashboard(QWidget):
         self.critical_event_count = str(stats.get("critical", 0))
 
         self.total_event_count = str(len(self.event_logs or []))
-        self.start_date, self.end_date = select_date_interval() if self.event_logs else ("", "")
-
+        self.start_date, self.end_date = self.db.select_date_interval() if self.event_logs else ("", "")
 
         # Log Level Card
         log_level_container = QVBoxLayout()
@@ -73,10 +76,12 @@ class Dashboard(QWidget):
         container.addStretch(1)
         self.main_layout.addLayout(container)
 
+
     # table & pane
     def filter_logs(self, text):
         self.proxy.setFilterCaseSensitivity(Qt.CaseInsensitive)
         self.proxy.setFilterFixedString(text)
+
 
     def refresh_pie_chart(self):
         self.pie.clear()
@@ -87,6 +92,7 @@ class Dashboard(QWidget):
             levels[l["level"]] = levels.get(l["level"], 0) + 1
         for k, v in levels.items():
             self.pie.append(k, v)
+
 
     def table_and_detail_ui(self):
         splitter = QSplitter(Qt.Horizontal)
@@ -116,6 +122,7 @@ class Dashboard(QWidget):
         self.layout().addWidget(splitter)
         self.layout().addWidget(self.search_box)
 
+
     def inspect_log(self, selected_log):
         source_index = self.proxy.mapToSource(selected_log)
         log = self.filtered_logs[source_index.row()]
@@ -123,12 +130,14 @@ class Dashboard(QWidget):
         formatted = "\n\n".join(f">> {k}: {v if v is not None else ''}" for k, v in log_dict.items())
         self.detail.setText(formatted)
 
+
     def update_data(self, new_logs):
         self.event_logs = new_logs
         self.filtered_logs = new_logs
         self.model.refresh_event_log_ui(self.filtered_logs)
         self.refresh_ui(self.event_logs)
-    
+
+
     def refresh_ui(self, new_event_logs=None):
         self.event_logs = new_event_logs if new_event_logs is not None else []
         stats = Counter(l["level"] for l in (self.event_logs or []))
@@ -137,9 +146,10 @@ class Dashboard(QWidget):
         self.error_card.update_smallsummarycard_value(stats.get("error", 0))
         self.critical_card.update_smallsummarycard_value(stats.get("critical", 0))
         self.total_card.update_summarycard_value(len(self.event_logs or []))
-        self.start_date, self.end_date = select_date_interval() if self.event_logs else ("", "")
+        self.start_date, self.end_date = self.db.select_date_interval() if self.event_logs else ("", "")
         self.date_range_card.update_summarycard_value(f"{self.start_date}\n          -\n{self.end_date}")
         self.refresh_pie_chart()
+
 
     # style
     def css_styles(self):

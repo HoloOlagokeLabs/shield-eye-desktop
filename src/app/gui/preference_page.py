@@ -1,5 +1,7 @@
-import traceback
 import json
+import uuid
+import traceback
+from json import JSONDecoder
 from datetime import datetime
 from PySide6.QtCore import QTimer, Signal
 from PySide6.QtWidgets import (
@@ -8,14 +10,19 @@ from PySide6.QtWidgets import (
     QMessageBox, QCheckBox
 )
 from gui.widgets.css import CHECK_BOX_STYLE, GENERAL_STYLES
-from utils.db_crud import *
+from utils.db_crud import Database
+
 
 source_dir = "Preferences page"
 
+
 class Preferences(QWidget):
     refresh_database = Signal()
+
+
     def __init__(self):
         super().__init__()
+        self.db = Database()
         self.setAutoFillBackground(True)
         self.setWindowTitle("Preferences")
         self.main_layout = QVBoxLayout(self)
@@ -25,6 +32,7 @@ class Preferences(QWidget):
         self.progress_bar.setFixedWidth(300)
         self.page_ui()
         self.css_styles()
+
 
     def page_ui(self):
         outer_container = QVBoxLayout()
@@ -72,6 +80,7 @@ class Preferences(QWidget):
         outer_container.addStretch(1)
         self.main_layout.addLayout(outer_container)
 
+
     def prefs_btn_clicked(self):
         self.progress_bar.show()
         id = str(uuid.uuid4())
@@ -80,10 +89,10 @@ class Preferences(QWidget):
         error_val = self.error_check.isChecked()
         critical_val = self.critical_check.isChecked()
 
-        result = fetch_prefs_settings()
+        result = self.db.fetch_prefs_settings()
         
         if result:
-            update_ps = update_prefs_settings(warn_val, error_val, critical_val)
+            update_ps = self.db.update_prefs_settings(warn_val, error_val, critical_val)
             if update_ps:
                 self.progress_bar.hide()
                 QMessageBox.information(self, "Success", "User alert preference updated")
@@ -91,14 +100,15 @@ class Preferences(QWidget):
                 self.progress_bar.hide()
                 QMessageBox.information(self, "Failed", "Something went wrong!")
         else:
-            saved_ps = save_prefs_settings(id, timestamp, warn_val, error_val, critical_val)
+            saved_ps = self.db.save_prefs_settings(id, timestamp, warn_val, error_val, critical_val)
             if saved_ps:
                 self.progress_bar.hide()
                 QMessageBox.information(self, "Success", "User alert preference created")
             else:
                 self.progress_bar.hide()
                 QMessageBox.information(self, "Failed", "Something went wrong!")
-        
+
+
     def process_json(self):
         file_path, _ = QFileDialog.getOpenFileName(self, "Open Log File", "", "JSON Files (*.json)")
         if not file_path: return
@@ -110,12 +120,43 @@ class Preferences(QWidget):
         # and show the progress bar before heavy JSON processing begins
         QTimer.singleShot(2000, lambda: self.perform_json_processing(file_path))
 
+
+    def load_multiple_json(self, content):
+        decoder = JSONDecoder()
+        pos = 0
+        length = len(content)
+        objects = []
+
+        while pos < length:
+            while pos < length and content[pos].isspace():
+                pos += 1
+
+            if pos >= length:
+                break
+
+            obj, index = decoder.raw_decode(content, pos)
+            objects.append(obj)
+            pos = index
+
+        return objects
+
+
     def perform_json_processing(self, file_path):
         try:
-            with open(file_path, "r") as f:
-                data = json.load(f)
-            
-            logs = data if isinstance(data, list) else [data]
+            with open(file_path, "r", encoding="utf-8") as f:
+                content = f.read()
+
+            try:
+                data = json.loads(content)
+
+                if isinstance(data, list):
+                    logs = data
+                else:
+                    logs = [data]
+
+            except json.JSONDecodeError:
+                logs = self.load_multiple_json(content)
+
             all_records = []
             
             for entry in logs:
@@ -140,15 +181,18 @@ class Preferences(QWidget):
                         entry["user"]["user_agent"]
                     )
                     all_records.append(log_data)
+
                 except KeyError as e:
                     self.progress_bar.hide()
-                    log_activity("error", type(e).__name__, source_dir, f"Rejected: Missing key {str(e)}", traceback.format_exc(), "process_json loop")
+                    self.status_label.setText("Uploading...")
+                    self.db.log_activity("error", type(e).__name__, source_dir, f"Rejected: Missing key {str(e)}", traceback.format_exc(), "process_json loop")
                     QMessageBox.warning(self, "Warn", f"Rejected: Missing key {str(e)}.")
                     self.status_label.setText(f"Rejected: Missing key {str(e)}")
                     return
+                
             if all_records:
                 self.progress_bar.hide()
-                result = append_log(all_records)
+                result = self.db.append_log(all_records)
                 if result:
                     self.status_label.setText(f"Success: Appended {len(all_records)} records.")
                     QMessageBox.information(self, "Success", f"Appended {len(all_records)} records.")
@@ -156,16 +200,19 @@ class Preferences(QWidget):
                     if self.prefs_sets:
                         self.status_label.setText("Checking alerts...")
                         self.progress_bar.show()
-                        QTimer.singleShot(2000, lambda: self.scan_for_alert(data))
+                        QTimer.singleShot(2000, lambda: self.scan_for_alert(logs))
                     return
+                
         except Exception as e:
             self.progress_bar.hide()
-            log_activity("error", type(e).__name__, source_dir, f"Invalid File: {str(e)}", traceback.format_exc(), "process_json func")
+            self.db.log_activity("error", type(e).__name__, source_dir, f"Invalid File: {str(e)}", traceback.format_exc(), "process_json func")
             QMessageBox.critical(self, "Error", f"Invalid File: {str(e)}")
             return
 
+
     def scan_for_alert(self, data):
         active_levels = set()
+
         if self.prefs_sets:
             levels = ["warn", "error", "critical"]
             for i, is_active in enumerate(self.prefs_sets):
@@ -194,15 +241,16 @@ class Preferences(QWidget):
                             "unread"
                         )
                         all_alert.append(alert_data)
+
                     except KeyError as e:
                         self.progress_bar.hide()
-                        log_activity("error", type(e).__name__, source_dir, f"Rejected: Missing key {str(e)}", traceback.format_exc(), "scan_for_alert loop")
+                        self.db.log_activity("error", type(e).__name__, source_dir, f"Rejected: Missing key {str(e)}", traceback.format_exc(), "scan_for_alert loop")
                         QMessageBox.warning(self, "Warn", f"Rejected: Missing key {str(e)}.")
                         return
             
             if all_alert:
                 self.progress_bar.hide()
-                result = create_alert(all_alert)
+                result = self.db.create_alert(all_alert)
                 if result:
                     self.status_label.setText(f"Success: {len(all_alert)} alert(s) created.")
                     QMessageBox.information(self, "Success", f"{len(all_alert)} alert(s) created.")
@@ -211,7 +259,7 @@ class Preferences(QWidget):
                 
         except Exception as e:
             self.progress_bar.hide()
-            log_activity("error", type(e).__name__, source_dir, f"Invalid Format: {str(e)}", traceback.format_exc(), "scan_for_alert func")
+            self.db.log_activity("error", type(e).__name__, source_dir, f"Invalid Format: {str(e)}", traceback.format_exc(), "scan_for_alert func")
             QMessageBox.critical(self, "Error", f"Invalid Format: {str(e)}")
 
 

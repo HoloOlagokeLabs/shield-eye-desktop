@@ -7,7 +7,7 @@ from PySide6.QtCore import Qt, QRunnable, QObject, Signal, QUrl
 from PySide6.QtWidgets import QPushButton, QDialog, QVBoxLayout, QLabel, QHBoxLayout
 from PySide6.QtGui import QDesktopServices
 import os
-from utils.db_crud import log_activity
+from utils.db_crud import Database
 
 source_dir = "update checker"
 
@@ -18,8 +18,10 @@ class UpdateSignals(QObject):
 class UpdateChecker(QRunnable):
     def __init__(self, update_url):
         super().__init__()
+        self.db = Database()
         self.update_url = update_url
         self.signals = UpdateSignals()
+
 
     def run(self):
         try:
@@ -37,8 +39,9 @@ class UpdateChecker(QRunnable):
             }
             self.signals.finished.emit(update_info)
         except Exception as e:
-            log_activity("error", type(e).__name__, source_dir, str(e), traceback.format_exc(), "UpdateChecker run")
+            self.db.log_activity("error", type(e).__name__, source_dir, str(e), traceback.format_exc(), "UpdateChecker run")
             self.signals.error.emit(str(e))
+
 
 class UpdateDetailDialog(QDialog):
     def __init__(self, data, parent=None):
@@ -82,6 +85,7 @@ class UpdateDownloader(QRunnable):
         self.new_update_version_hash = new_update_version_hash
         self.signals = DownloadSignals()
 
+
     def run(self):
         try:
             temp_dir = tempfile.gettempdir()
@@ -114,8 +118,9 @@ class UpdateDownloader(QRunnable):
 
             self.signals.finished.emit(local_filename)
         except Exception as e:
-            log_activity("error", type(e).__name__, source_dir, str(e), traceback.format_exc(), "UpdateDownloader run")
+            self.db.log_activity("error", type(e).__name__, source_dir, str(e), traceback.format_exc(), "UpdateDownloader run")
             self.signals.error.emit(str(e))
+
 
     def hash_file(self, file_path):
         with open(file_path, "rb") as f:

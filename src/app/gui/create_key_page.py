@@ -1,27 +1,20 @@
 import os
-from pathlib import Path
-
-from PySide6.QtCore import QStandardPaths, QTimer, Signal, Qt
+from PySide6.QtCore import QTimer, Signal, Qt
 from PySide6.QtWidgets import (
     QProgressBar, QStackedWidget, QWidget, QVBoxLayout, QLabel,
     QLineEdit, QPushButton, QMessageBox, QFrame
 )
-
 from gui.widgets.css import CREATE_KEY_STYLES, GENERAL_STYLES
-from utils.db_crud import create_keycode, get_db_key, init_db, verify_db_key
+from utils.db_crud import Database
 
-db_name = os.getenv("DB_NAME", default="database.db")
-data_dir = Path(
-    QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
-)
-data_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
-STORAGE = data_dir / db_name
 
 class PragmaKeyManager(QWidget):
     successful = Signal()
 
+
     def __init__(self):
         super().__init__()
+        self.db = Database()
         self.setWindowTitle("Create PRAGMA Key")
         self.setFixedSize(800, 400)
         self.main_layout = QVBoxLayout(self)
@@ -35,6 +28,7 @@ class PragmaKeyManager(QWidget):
         self.main_layout.addWidget(self.stack)
         
         QTimer.singleShot(3000, self.check_existing_key)
+
 
     def init_loading_screen(self):
         self.loading_page = QFrame()
@@ -55,6 +49,7 @@ class PragmaKeyManager(QWidget):
         layout.addWidget(label)
         layout.addWidget(self.check_progress)
         self.stack.addWidget(self.loading_page)
+
 
     def init_create_screen(self):
         self.create_page = QFrame()
@@ -84,14 +79,17 @@ class PragmaKeyManager(QWidget):
         
         self.stack.addWidget(self.create_page)
 
+
     def start_database(self):
-        self.init_db = init_db()
+        self.db.init_db()
         QTimer.singleShot(2000, lambda: self.successful.emit())
         QTimer.singleShot(2500, lambda: self.progress_bar.hide())
 
+
     def check_existing_key(self):
-        found_db_key = get_db_key() 
-        db_exists = STORAGE.exists()
+        found_db_key = self.db.get_db_key()
+        storage = self.db.get_db_path()
+        db_exists = storage.exists()
 
         # If database is found but no key to decrypt it
         # User is required to provide the decryption key
@@ -122,7 +120,8 @@ class PragmaKeyManager(QWidget):
 
         # If both database and key are found
         # System check if the key can decrypt the database
-        key_check = verify_db_key()
+        key_check = self.db.verify_db_key()
+        
         if key_check is False:
             self.title.setText("Enter PRAGMA Key")
             self.key_input.setPlaceholderText("Enter PRAGMA Key")
@@ -132,11 +131,12 @@ class PragmaKeyManager(QWidget):
                 "Key Mismatch",
                 f"The key you entered does not match the existing database.\n\n"
                 f"If you have forgotten your key, you must delete the old database file to start fresh.\n\n"
-                f"Database location:\n{STORAGE}"
+                f"Database location:\n{storage}"
             )
             return
         else:
             self.start_database()
+
 
     def handle_validation(self):
         self.progress_bar.show()
@@ -149,9 +149,12 @@ class PragmaKeyManager(QWidget):
             return
 
         if pragma_key:
-            key_created = create_keycode(pragma_key)
+            storage = self.db.get_db_path()
+            key_created = self.db.create_keycode(pragma_key)
+
             if key_created:
-                key_check = verify_db_key()
+                key_check = self.db.verify_db_key()
+
                 if key_check is False:
                     self.progress_bar.hide()
                     QMessageBox.critical(
@@ -159,7 +162,7 @@ class PragmaKeyManager(QWidget):
                         "Key Mismatch",
                         f"The key you entered does not match the existing database.\n\n"
                         f"If you have forgotten your key, you must delete the old database file to start fresh.\n\n"
-                        f"Database location:\n{STORAGE}"
+                        f"Database location:\n{storage}"
                     )
                     return
                 

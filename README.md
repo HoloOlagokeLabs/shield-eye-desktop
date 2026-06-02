@@ -1,6 +1,6 @@
 # ShieldEye Log Analyzer
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Version](https://img.shields.io/badge/version-1.1.0-blue)
 ![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Windows-lightgrey)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Python](https://img.shields.io/badge/python-3.8+-yellow)
@@ -49,14 +49,9 @@ This README serves as a **technical manual** for integrating and using the Shiel
   - [Architecture Philosophy](#architecture-philosophy)
   - [Open Source \& Customization](#open-source--customization)
   - [Releases](#releases)
-    - [v1.0.0 — Initial Stable Release](#v100--initial-stable-release)
-      - [🚀 Highlights](#-highlights)
-      - [🖥️ Web Platform](#️-web-platform)
-      - [💻 Desktop Platform](#-desktop-platform)
-      - [🔐 Security \& Design](#-security--design)
-      - [📦 Installation](#-installation)
-      - [🧠 SOC Workflow Support](#-soc-workflow-support)
-    - [🔮 Upcoming Releases](#-upcoming-releases)
+    - [Latest Release](#latest-release)
+      - [Highlights](#highlights)
+      - [Installation](#installation)
   - [Contributing](#contributing)
   - [License](#license)
   - [Notes](#notes)
@@ -123,12 +118,12 @@ The ShieldEye Desktop application can be downloaded from [the latest release](ht
 
 ```bash
 sudo apt update
-sudo apt install ./shieldeye_1.0.0_amd64.deb
+sudo apt install ./shieldeye_1.1.0_amd64.deb
 ```
 
 ### Quick Install (Windows)
 
-Double click on the installer `shieldeye_1.0.0_setup.exe`
+Double click on the installer `shieldeye_1.1.0_setup.exe`
 
 ---
 
@@ -360,6 +355,7 @@ Required fields:
 ## Tutorials
 
 - [How to integrate ShieldEye](./tutorials/How_to_integrate_ShieldEye.md)
+- [YouTube Playlist](https://youtube.com/playlist?list=PL1IOjRE7eB0HsqeGqTmeWZBgaqxmHwUcI&si=Ms5X1LMK-679Ot5V)
 
 ---
 
@@ -445,67 +441,24 @@ For upgrade strategies and architectural extension ideas, review the codebase st
 
 ## Releases
 
-ShieldEye follows a structured release approach to track feature updates, improvements, and platform changes.
+### Latest Release
 
-### v1.0.0 — Initial Stable Release
+**Current Version:** v1.1.0
 
-**Release Date:** 2026-04-19
+See the [CHANGELOG.md](./CHANGELOG.md) for a complete release history and detailed release notes.
 
-This release introduces the core functionality of ShieldEye as a hybrid log analysis platform.
+#### Highlights
 
-#### 🚀 Highlights
+- Improved JSON import reliability
+- Newest-first event log sorting
+- Consistent database storage across deployments
+- Improved SQLCipher validation and database handling
+- Multiple bug fixes and stability improvements
 
-- Web-based log analysis platform (current-month monitoring)
-- Desktop application for offline and historical log analysis
-- Structured logging system for developer-controlled event tracking
-- MongoDB integration with read-only access model
-- SOC-oriented log filtering and investigation workflow
+#### Installation
 
-#### 🖥️ Web Platform
-
-- Real-time and near real-time log monitoring
-- Current-month log scope for performance efficiency
-- Lightweight detection-focused analysis
-
-> ⚠️ The web backend is currently inactive and will resume based on user demand or technical demonstration requests.
-
-#### 💻 Desktop Platform
-
-- Import JSON logs exported from MongoDB
-- Perform historical and forensic log analysis
-- Designed for deep investigation without performance constraints
-
-#### 🔐 Security & Design
-
-- No log storage on ShieldEye servers (user-controlled data model)
-- Read-only database access using `shieldeye_agent`
-- Encourages secure logging practices (no sensitive data)
-
-#### 📦 Installation
-
-- [Download](https://github.com/holoolagoke/shield-eye-desktop/releases/latest) the latest version for your OS and
-- Follow [installation](./DESKTOP_INSTALLATION.md) process for your OS
-
-#### 🧠 SOC Workflow Support
-
-- Detection → Investigation → Forensic Analysis workflow
-- Separation of real-time monitoring (web) and deep analysis (desktop)
-
----
-
-### 🔮 Upcoming Releases
-
-Planned enhancements include:
-
-- Advanced correlation rules for threat detection
-- Timeline-based log visualization
-- Export and reporting capabilities
-- Enhanced filtering and search performance
-- Potential reactivation and scaling of the web platform
-
----
-
-For full release artifacts and downloads, refer to the [Release](https://github.com/holoolagoke/shield-eye-desktop/releases/latest) in this repository.
+- Download the latest release from GitHub Releases
+- Follow the installation guide in DESKTOP_INSTALLATION.md
 
 ---
 

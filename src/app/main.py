@@ -3,7 +3,7 @@ import sys
 from dotenv import load_dotenv
 load_dotenv()
 import traceback
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt, QTimer, QCoreApplication
 from PySide6.QtGui import QFont, QIcon, QPixmap, QPalette, QBrush
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QPushButton,
@@ -15,7 +15,7 @@ from gui.dashboard_page import Dashboard
 from gui.about_page import About
 from gui.notifications_page import Notifications
 from gui.preference_page import Preferences
-from utils.db_crud import *
+from utils.db_crud import Database
 
 source_dir = "base app"
 app_name = os.getenv("APP_NAME",  default="ShiedEye App")
@@ -23,9 +23,11 @@ basedir = os.path.dirname(__file__)
 icon_path = os.path.join(basedir, "assets", "icons", "logo.png")
 bg_img_path = os.path.join(basedir, "assets", "themes", "background.png")
 
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.db = Database()
 
         self.setStyleSheet("""
             QStackedWidget, .Dashboard, .Notifications, .Preferences, .About {
@@ -56,6 +58,7 @@ class MainWindow(QMainWindow):
         self.create_key_page = PragmaKeyManager()
         self.create_key_page.successful.connect(self.on_prakey_success)
         self.root_layout.addWidget(self.create_key_page)
+
 
     def start_main_app(self):
         self.main_app_widget = QWidget()
@@ -109,30 +112,33 @@ class MainWindow(QMainWindow):
         # before showing a critical error dialog on startup
         QTimer.singleShot(100, self.delayed_sql_check)
 
-    def on_prakey_success(self):
 
+    def on_prakey_success(self):
         self.create_key_page.hide()
         self.start_main_app()
         self.refresh_all_data()
-        
+
+
     def delayed_sql_check(self):
-        result = verify_sql_version()
+        result = self.db.verify_sql_version()
         if isinstance(result, str):
             QMessageBox.critical(self, "Error", result)
 
+
     def refresh_all_data(self):
         try:
-            self.event_logs = fetch_log()
-            self.alert_logs = fetch_alert_log()
-            self.prefs_sets = fetch_prefs_settings()
+            self.event_logs = self.db.fetch_log()
+            self.alert_logs = self.db.fetch_alert_log()
+            self.prefs_sets = self.db.fetch_prefs_settings()
 
             self.dashboard.update_data(self.event_logs)
             self.notifications.update_data(self.alert_logs)
             self.preferences.update_prefs(self.prefs_sets)
         except Exception as e:
-            log_activity("error", type(e).__name__, source_dir, f"File: {str(e)}", traceback.format_exc(), "refresh_all_data func")
+            self.db.log_activity("error", type(e).__name__, source_dir, f"File: {str(e)}", traceback.format_exc(), "refresh_all_data func")
             QMessageBox.critical(self, "Error", f"Error: {str(e)}")
             return
+
 
     def set_background(self):
         img = QPixmap(bg_img_path)
@@ -146,6 +152,10 @@ if sys.platform == "win32":
     QApplication.setHighDpiScaleFactorRoundingPolicy(
         Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
     )
+
+QCoreApplication.setOrganizationName("HoloOlagokeLabs")
+QCoreApplication.setOrganizationDomain("holoolagoke.com")
+QCoreApplication.setApplicationName("ShieldEye")
 
 app = QApplication(sys.argv)
 app.setFont(QFont("Segoe UI", 10))
