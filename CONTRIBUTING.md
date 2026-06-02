@@ -180,6 +180,7 @@ WEBSITE_URL=https://www.holoolagoke.com
 SHIELDEYE_WEBSITE_URL=https://shieldeye.holoolagoke.com
 DEVELOPER_NAME=Holo Olagoke
 DEVELOPER_CONTACT=contact@holoolagoke.com
+DEV_MODE=production
 ```
 
 Run the app from source
