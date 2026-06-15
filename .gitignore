@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyc
+*.pyo
+*.pyd
+.env
+
+# others
+init_project.py
+src/app/nuitka-crash-report.xml
+src/app/pysidedeploy.spec
+folder/
+
+# PySide6 / Qt Generated Files
+ui_*.py
+rc_*.py
+*_rc.py
+*.user
+
+# Nuitka build artifacts
+main.build/
+main.dist/
+main.onefile-build/
+*.dist/
+
+# Distribution / Packaging
+build/
+dist/
+*.spec
+
+# IDEs and OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Environments
+.venv/
+.env

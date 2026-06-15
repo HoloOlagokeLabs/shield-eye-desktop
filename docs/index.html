@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>ShieldEye Documentation</title>
+
+        <!-- Tailwind CDN -->
+        <script src="https://cdn.tailwindcss.com"></script>
+
+        <style>
+            pre { overflow-x: auto; }
+        </style>
+    </head>
+
+    <body class="bg-gray-50 text-gray-800">
+
+        <div class="flex">
+
+            <!-- Sidebar -->
+            <aside class="w-64 h-screen sticky top-0 bg-white border-r p-5 hidden md:block">
+                <h1 class="text-xl font-bold mb-4">ShieldEye Docs</h1>
+                <nav class="space-y-2 text-sm">
+                    <a href="#overview" class="block hover:text-blue-600">Overview</a>
+                    <a href="#installation" class="block hover:text-blue-600">Installation</a>
+                    <a href="#quickstart" class="block hover:text-blue-600">Quick Start</a>
+                    <a href="#integration" class="block hover:text-blue-600">Integration</a>
+                    <a href="#schema" class="block hover:text-blue-600">Log Schema</a>
+                    <a href="#desktop" class="block hover:text-blue-600">Desktop App</a>
+                    <a href="#workflow" class="block hover:text-blue-600">SOC Workflow</a>
+                    <a href="#security" class="block hover:text-blue-600">Security</a>
+                    <a href="#release-notes" class="block hover:text-blue-600">Release Notes</a>
+                </nav>
+
+                <nav class="space-y-2 text-sm mt-5">
+                    <a href="https://shieldeye.holoolagoke.com" class="block hover:text-blue-600">Open Web App</a>
+                    <a href="https://github.com/holoolagoke/shield-eye-desktop" class="block hover:text-blue-600">GitHub</a>
+                    <a href="https://github.com/HoloOlagokeLabs/shield-eye-desktop/blob/main/CHANGELOG.md" class="block hover:text-blue-600">Changelog</a>
+                    <a href="https://github.com/HoloOlagokeLabs/shield-eye-desktop/blob/main/SECURITY.md" class="block hover:text-blue-600">Security Policy</a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1 p-6 max-w-5xl mx-auto">
+
+                <!-- Header -->
+                <header class="mb-10">
+                    <h1 class="text-4xl font-bold mb-2">ShieldEye Log Analyzer</h1>
+                    <p class="text-gray-600">
+                        Manual Log Event Collection, Analysis & Security Monitoring
+                    </p>
+                    <div class="mt-3 text-sm text-gray-500">
+                        Version 1.1.0 • Released 2026-05-02 • MIT License
+                    </div>
+                </header>
+
+                <!-- Overview -->
+                <section id="overview" class="mb-12">
+                    <h2 class="text-2xl font-semibold mb-4">1. Overview</h2>
+                    <p class="mb-4">
+                        ShieldEye is a structured logging and security analysis platform designed
+                        for developers and SOC analysts. It enables consistent log collection,
+                        MongoDB storage, and forensic analysis via desktop tooling.
+                    </p>
+
+                    <h3 class="font-semibold mt-4">Key Capabilities</h3>
+                    <ul class="list-disc ml-6 mt-2 space-y-1">
+                        <li>Structured security event logging</li>
+                        <li>MongoDB-based storage (developer-controlled)</li>
+                        <li>Real-time (web) + forensic (desktop) analysis</li>
+                        <li>SOC workflow support (Detection → Investigation → Analysis)</li>
+                    </ul>
+
+                    <h3 class="font-semibold mt-6">Architecture</h3>
+                    <pre class="bg-gray-900 text-green-400 p-4 rounded mt-2 text-sm">
+                Application → logEvent() → Logger → MongoDB → ShieldEye Platform → Analysis Engine
+                    </pre>
+
+                    <h3 class="font-semibold mt-6">Security Design</h3>
+                    <ul class="list-disc ml-6 mt-2 space-y-1">
+                        <li>Logs remain in your infrastructure</li>
+                        <li>Read-only MongoDB access</li>
+                        <li>SQLCipher encrypted local database</li>
+                        <li>SHA-256 integrity verification support</li>
+                    </ul>
+
+                    <h3 class="font-semibold mt-6">Local Storage</h3>
+                    <ul class="list-disc ml-6 mt-2 space-y-1">
+                        <li>Application data is stored in the operating system's user data directory.</li>
+                        <li>Desktop logs are stored locally.</li>
+                        <li>No user log data is transmitted to ShieldEye servers.</li>
+                    </ul>
+                </section>
+
+                <!-- Installation -->
+                <section id="installation" class="mb-12">
+                    <h2 class="text-2xl font-semibold mb-4">2. Installation</h2>
+
+                    <h3 class="font-semibold">Linux (Debian/Ubuntu)</h3>
+                    <pre class="bg-gray-900 text-green-400 p-4 rounded text-sm mt-2">
+                sudo apt update
+                wget https://github.com/holoolagoke/shield-eye-desktop/releases/download/v1.1.0/shieldeye_1.1.0_amd64.deb
+                sudo apt install ./shieldeye_1.1.0_amd64.deb
+                    </pre>
+
+                    <h3 class="font-semibold mt-6">Windows</h3>
+                    <pre class="bg-gray-900 text-green-400 p-4 rounded text-sm mt-2">
+                curl -L -o shieldeye_setup.exe "https://github.com/holoolagoke/shield-eye-desktop/releases/latest"
+                    </pre>
+                </section>
+
+                <!-- Quick Start -->
+                <section id="quickstart" class="mb-12">
+                    <h2 class="text-2xl font-semibold mb-4">3. Quick Start</h2>
+
+                    <ol class="list-decimal ml-6 space-y-2">
+                        <li>Install & launch the app</li>
+                        <li>Integrate logger middleware</li>
+                        <li>Export MongoDB logs</li>
+                        <li>Set alert preferences</li>
+                        <li>Upload & analyze logs</li>
+                    </ol>
+                </section>
+
+                <!-- Integration -->
+                <section id="integration" class="mb-12">
+                    <h2 class="text-2xl font-semibold mb-4">4. Integration Guide</h2>
+
+                    <h3 class="font-semibold">Logger Example (Node.js)</h3>
+                    <pre class="bg-gray-900 text-green-400 p-4 rounded text-sm">
+                import { v4 as uuidv4 } from "uuid"
+
+                export async function logEvent(req, res, data) {
+                const log = {
+                    _id: uuidv4(),
+                    timestamp: new Date(),
+                    ...data
+                }
+
+                await db.collection("event_logs").insertOne(log)
+                }
+                    </pre>
+
+                    <h3 class="font-semibold mt-6">SOC Event Example</h3>
+                    <pre class="bg-gray-900 text-green-400 p-4 rounded text-sm">
+                await logEvent(req, res, {
+                event_type: "LOGIN_FAILED",
+                level: "warn",
+                category: "authentication",
+                message: "Failed login attempt"
+                })
+                    </pre>
+                </section>
+
+                <!-- Schema -->
+                <section id="schema" class="mb-12">
+                    <h2 class="text-2xl font-semibold mb-4">5. Log Schema</h2>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border">
+                        <thead class="bg-gray-100">
+                            <tr>
+                            <th class="p-2 text-left">Field</th>
+                            <th class="p-2 text-left">Type</th>
+                            <th class="p-2 text-left">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-t">
+                            <td class="p-2">_id</td>
+                            <td class="p-2">UUID</td>
+                            <td class="p-2">Unique identifier</td>
+                            </tr>
+                            <tr class="border-t">
+                            <td class="p-2">timestamp</td>
+                            <td class="p-2">Date</td>
+                            <td class="p-2">Event time</td>
+                            </tr>
+                            <tr class="border-t">
+                            <td class="p-2">level</td>
+                            <td class="p-2">String</td>
+                            <td class="p-2">info | warn | error | critical</td>
+                            </tr>
+                        </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Desktop -->
+                <section id="desktop" class="mb-12">
+                    <h2 class="text-2xl font-semibold mb-4">6. Desktop Application</h2>
+
+                    <ul class="list-disc ml-6 space-y-1">
+                        <li>Encrypted local database (SQLCipher)</li>
+                        <li>Dashboard with charts and logs</li>
+                        <li>Alerts management system</li>
+                        <li>JSON log import support for ShieldEye exports and MongoDB-compatible exports</li>
+                    </ul>
+                </section>
+
+                <!-- SOC Workflow -->
+                <section id="workflow" class="mb-12">
+                    <h2 class="text-2xl font-semibold mb-4">7. SOC Workflow</h2>
+
+                    <ol class="list-decimal ml-6 space-y-2">
+                        <li><strong>Detection:</strong> Monitor logs</li>
+                        <li><strong>Investigation:</strong> Export suspicious data</li>
+                        <li><strong>Forensics:</strong> Analyze in desktop app</li>
+                    </ol>
+                </section>
+
+                <!-- Security -->
+                <section id="security" class="mb-12">
+                    <h2 class="text-2xl font-semibold mb-4">8. Security Guidelines</h2>
+
+                    <h3 class="font-semibold">Never Log:</h3>
+                    <ul class="list-disc ml-6 space-y-1 text-red-600">
+                        <li>Passwords</li>
+                        <li>JWT tokens</li>
+                        <li>API keys</li>
+                        <li>PII</li>
+                    </ul>
+                </section>
+
+                <section id="release-notes" class="mb-12">
+                    <h2 class="text-2xl font-semibold mb-4">9. Release Notes</h2>
+
+                    <h3 class="font-semibold">Version 1.1.0</h3>
+
+                    <ul class="list-disc ml-6 mt-2 space-y-1">
+                        <li>Improved JSON import reliability.</li>
+                        <li>Support for MongoDB export compatibility improvements.</li>
+                        <li>Event logs now display newest records first.</li>
+                        <li>Improved database path consistency across deployments.</li>
+                        <li>Enhanced SQLCipher initialization and validation.</li>
+                        <li>Multiple stability and usability fixes.</li>
+                    </ul>
+                </section>
+
+                <!-- Footer -->
+                <footer class="border-t pt-6 text-sm text-gray-500">
+                    © 2026 Holo Olagoke — MIT License
+                </footer>
+
+            </main>
+        </div>
+
+    </body>
+</html>

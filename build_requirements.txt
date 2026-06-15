@@ -1,0 +1,15 @@
+# ==============================================================
+# ShieldEye Desktop - Build Requirements
+# ==============================================================
+# These are ONLY needed to compile the app into a binary.
+# Do NOT install these for running from source.
+#
+# Install with: pip install -r build_requirements.txt
+# ==============================================================
+
+# --- Compiler ---
+Nuitka==4.0.7
+
+# --- Linux build only ---
+# Required by Nuitka on Linux to patch ELF binaries and handle dependencies.
+patchelf==0.18.0.0; sys_platform == 'linux'
